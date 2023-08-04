@@ -73,10 +73,10 @@ exports.uploadImage = async (req, res, next) => {
     if (!book) {
       return res.status(404).json({ message: "Resource not found" });
     }
-    const profile = req.files.profile;
+    const imgUrl = req.files.imgUrl;
     // Validate Image
-    const fileSize = profile.size / 1000;
-    const fileExt = profile.name.split(".")[1];
+    const fileSize = imgUrl.size / 1000;
+    const fileExt = imgUrl.name.split(".")[1];
     if (fileSize > 500) {
       return res
         .status(400)
@@ -89,14 +89,14 @@ exports.uploadImage = async (req, res, next) => {
         .json({ message: "file extension must be jpg or png" });
     }
 
-    const fileName = `${req.params.id}${path.extname(profile.name)}`;
-    profile.mv(`uploads/${fileName}`, async (err) => {
+    const fileName = `${req.params.id}${path.extname(imgUrl.name)}`;
+    imgUrl.mv(`uploads/${fileName}`, async (err) => {
       if (err) {
         console.log(err);
         return res.status(500).send(err);
       }
       // update book image field
-      await Book.findByIdAndUpdate(req.params.id, { profile: fileName });
+      await Book.findByIdAndUpdate(req.params.id, { imgUrl: fileName });
       res.status(200).json({
         data: {
           file: `${req.protocol}://${req.get("host")}/${fileName}`,
